@@ -19,10 +19,9 @@
 from typing import List, Union
 
 import pyrogram
-from pyrogram import raw
-from pyrogram import types
-from ..object import Object
-from ..update import Update
+from pyrogram import raw, types
+from pyrogram.types.object import Object
+from pyrogram.types.update import Update
 
 
 class Poll(Object, Update):
@@ -69,8 +68,9 @@ class Poll(Object, Update):
         is_anonymous: bool = None,
         type: str = None,
         allows_multiple_answers: bool = None,
-        # correct_option_id: int,
-        chosen_option: int = None
+        correct_option_id: int,
+        chosen_option: int = None,
+        exp: str = None
     ):
         super().__init__(client)
 
@@ -82,8 +82,9 @@ class Poll(Object, Update):
         self.is_anonymous = is_anonymous
         self.type = type
         self.allows_multiple_answers = allows_multiple_answers
-        # self.correct_option_id = correct_option_id
+        self.correct_option_id = correct_option_id
         self.chosen_option = chosen_option
+        self.exp = exp
 
     @staticmethod
     def _parse(client, media_poll: Union["raw.types.MessageMediaPoll", "raw.types.UpdateMessagePoll"]) -> "Poll":
@@ -94,10 +95,12 @@ class Poll(Object, Update):
 
         for i, answer in enumerate(poll.answers):
             voter_count = 0
+            correct = None
 
             if results:
                 result = results[i]
                 voter_count = result.voters
+                correct = result.correct
 
                 if result.chosen:
                     chosen_option = i
@@ -106,6 +109,8 @@ class Poll(Object, Update):
                 types.PollOption(
                     text=answer.text,
                     voter_count=voter_count,
+                    correct=correct,
+                    exp=media_poll.results.solution,
                     data=answer.option,
                     client=client
                 )
@@ -121,6 +126,7 @@ class Poll(Object, Update):
             type="quiz" if poll.quiz else "regular",
             allows_multiple_answers=poll.multiple_choice,
             chosen_option=chosen_option,
+            # exp=exp,
             client=client
         )
 
@@ -130,6 +136,7 @@ class Poll(Object, Update):
             return Poll._parse(client, update)
 
         results = update.results.results
+        # print("update==="+str(update))
         chosen_option = None
         options = []
 
@@ -142,6 +149,7 @@ class Poll(Object, Update):
                     text="",
                     voter_count=result.voters,
                     data=result.option,
+                    exp=None,
                     client=client
                 )
             )
@@ -153,5 +161,7 @@ class Poll(Object, Update):
             total_voter_count=update.results.total_voters,
             is_closed=False,
             chosen_option=chosen_option,
+
+            results=results,
             client=client
         )
