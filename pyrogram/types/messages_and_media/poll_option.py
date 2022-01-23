@@ -22,29 +22,41 @@ from ..object import Object
 
 class PollOption(Object):
     """Contains information about one answer option in a poll.
-
-    Parameters:
-        text (``str``):
-            Option text, 1-100 characters.
-
-        voter_count (``int``):
-            Number of users that voted for this option.
-            Equals to 0 until you vote.
-
-        data (``bytes``):
-            The data this poll option is holding.
+    
+        Parameters:
+            text (``str``):
+                Option text, 1-100 characters.
+        
+            voter_count (``int``):
+                Number of users that voted for this option.
+                Equals to 0 until you vote.
+        
+            data (``bytes``):
+                The data this poll option is holding.
+        
+            correct (``bool``, *optional*):
+                the option is the correct answer
+        
+            exp (``str``):
+                Option text, 1-100 characters.
+        
+        
     """
-
     def __init__(
-        self,
-        *,
-        client: "pyrogram.Client" = None,
-        text: str,
-        voter_count: int,
-        data: bytes
+            self,
+            *,
+            client: "pyrogram.Client" = None,
+            text: str,
+            voter_count: int,
+            data: bytes,
+            correct: bool = None,
+            exp: str
     ):
         super().__init__(client)
-
+    
         self.text = text
         self.voter_count = voter_count
+        self.correct = correct
+        self.exp = exp
         self.data = data
+
