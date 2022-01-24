@@ -138,17 +138,21 @@ class Poll(Object, Update):
         results = update.results.results
         # print("update==="+str(update))
         chosen_option = None
+        correct_option = None
         options = []
 
         for i, result in enumerate(results):
             if result.chosen:
                 chosen_option = i
+            if result.correct:
+                correct_option = i
 
             options.append(
                 types.PollOption(
                     text="",
                     voter_count=result.voters,
                     data=result.option,
+                    correct=result.correct,
                     exp=None,
                     client=client
                 )
@@ -160,8 +164,8 @@ class Poll(Object, Update):
             options=options,
             total_voter_count=update.results.total_voters,
             is_closed=False,
+            correct_option_id=correct_option,
             chosen_option=chosen_option,
-
-            results=results,
+            # results=results,
             client=client
         )
