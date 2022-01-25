@@ -91,6 +91,7 @@ class Poll(Object, Update):
         poll = media_poll.poll  # type: raw.types.Poll
         results = media_poll.results.results
         chosen_option = None
+        correct_option = None
         options = []
 
         for i, answer in enumerate(poll.answers):
@@ -104,6 +105,9 @@ class Poll(Object, Update):
 
                 if result.chosen:
                     chosen_option = i
+
+                if correct:
+                    correct_option = i
 
             options.append(
                 types.PollOption(
@@ -125,7 +129,7 @@ class Poll(Object, Update):
             is_anonymous=not poll.public_voters,
             type="quiz" if poll.quiz else "regular",
             allows_multiple_answers=poll.multiple_choice,
-            chosen_option=chosen_option,
+            chosen_option=chosen_option, correct_option_id=correct_option,
             # exp=exp,
             client=client
         )
